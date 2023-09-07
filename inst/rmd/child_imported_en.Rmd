@@ -1,0 +1,6 @@
+
+## Data
+
+  - The network is `r R$upload$Dataset$type`
+  - The network nodes are made up of `r ifelse(is_bipartite, paste(dim(R$upload$Dataset$matrix)[2],R$upload$labels$col,"in columns and",dim(R$upload$Dataset$matrix)[1], R$upload$labels$row,"in lines"), paste(dim(R$upload$Dataset$matrix)[2],R$upload$labels$col))`
+  - Edges take `r ifelse(R$upload$Dataset$law == "bernoulli", "binary (0 or 1)",ifelse(R$upload$Dataset$law == "poisson", "integers (0, 1, 2 , . .)", "real"))` values `r ifelse(is_bipartite,"",ifelse(R$upload$directed, "and are directed.", "and are symmetrical."))`

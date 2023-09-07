@@ -1,0 +1,3 @@
+## Empty report
+
+You haven't imported anything, so the report is empty. As this report is based on a current image in the application, please import a dataset and run SBM to enrich it.

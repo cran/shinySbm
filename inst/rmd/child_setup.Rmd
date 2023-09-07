@@ -1,0 +1,48 @@
+
+```{r setup, echo=FALSE}
+nb_digits <- 2
+options(digits = nb_digits)
+
+library(shinySbm)
+
+R <- purrr::map(params, ~ if (identical(.x, "NA")) {
+  NA
+} else {
+  .x
+})
+show_mat <- !identical(R$upload, NA)
+show_sbm <- !identical(R$sbm, NA)
+
+if (!identical(R$options, NA)) {
+  is_transposed <- R$options$showTransposed
+} else {
+  is_transposed <- F
+}
+if (show_mat) {
+  is_bipartite <- R$upload$Dataset$type == "bipartite"
+} else {
+  is_bipartite <- F
+}
+
+colorize <- function(x, color, highlight = FALSE) {
+  if (knitr::is_latex_output()) {
+    color <- ifelse(color == 'lightblue',"cyan",color)
+    sprintf("\\textcolor{%s}{%s}", color, x)
+  } else if (knitr::is_html_output()) {
+    if(highlight){
+      shinySbm:::colour_mark(x, color, as.html = F)
+    }else{ 
+      shinySbm:::colour_font(x, color, as.html = F)
+    }
+  } else x
+}
+
+fit_width_to_output <- function(x,max_pdf_with = 7.1, max_html_with = 12){
+  if (knitr::is_latex_output()) {
+    flextable::fit_to_width(x,max_width = max_pdf_with)
+  } else if (knitr::is_html_output()) {
+    flextable::fit_to_width(x,max_width = max_html_with)
+  } else x
+}
+
+```

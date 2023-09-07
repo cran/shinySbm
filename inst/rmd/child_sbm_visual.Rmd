@@ -1,0 +1,19 @@
+```{r plot-sbm ,fig.align = 'center', echo=FALSE, fig.width=12}
+switch(R$options$whichMatrix,
+  "raw" = plotSbm(R$sbm,
+    ordered = FALSE, transpose = R$options$showTransposed,
+    labels = R$upload$labels,
+    plotOptions = R$options
+  ),
+  "ordered" = plotSbm(R$sbm,
+    ordered = TRUE, transpose = R$options$showTransposed,
+    labels = R$upload$labels,
+    plotOptions = R$options
+  ),
+  "expected" = plotSbm(R$sbm,
+    ordered = TRUE, transpose = R$options$showTransposed,
+    labels = R$upload$labels,
+    plotOptions = c(R$options, showValues = F)
+  )
+)
+```

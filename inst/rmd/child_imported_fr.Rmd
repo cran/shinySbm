@@ -1,0 +1,6 @@
+
+## Données
+
+  - Le réseau est `r R$upload$Dataset$type`
+  - Les noeuds du réseaux sont composés de `r ifelse(is_bipartite, paste(dim(R$upload$Dataset$matrix)[2],R$upload$labels$col,"en colonnes et",dim(R$upload$Dataset$matrix)[1], R$upload$labels$row,"en lignes"), paste(dim(R$upload$Dataset$matrix)[2],R$upload$labels$col))`
+  - Les arêtes prennent des valeurs `r ifelse(R$upload$Dataset$law == "bernoulli","binaires (0 ou 1)",ifelse(R$upload$Dataset$law == "poisson", "enti\ue8res (0, 1, 2 , ...)",paste0("r","\ue9","elles")))` `r ifelse(is_bipartite,"",ifelse(R$upload$directed,"et sont dirig\ue9es.","et sont sym\ue9triques."))`

@@ -1,0 +1,58 @@
+---
+title: "Shiny SBM Report"
+params:
+  upload: NA
+  sbm: NA
+  options: NA
+  langue: EN
+---
+
+```{r child-setup, child= 'child_setup.Rmd'}
+```
+
+```{r child-empty, child=if(!show_mat & !show_sbm) 'child_empty_en.Rmd'}
+```
+
+```{r child-imported, echo=FALSE, results = 'asis'}
+if (show_mat) {
+  cat("## Introduction\nThis automatic report was produced by the [Shiny SBM](https://forgemia.inra.fr/theodore.vanrenterghem/shinySbm) application (also available via this [link](https://shiny.migale.inrae.fr/app/ShinySBM)). It is an application summary of a stochastic block model. The modeling part is based on the R package [sbm](https://CRAN.R-project.org/package=sbm).")
+
+  imported_text <- knitr::knit_child("child_imported_en.Rmd", quiet = TRUE)
+  cat(imported_text,'\n', sep = "\n")
+
+  cat("## Matrix Visual")
+
+  imported_vis <- knitr::knit_child("child_imported_visual.Rmd", quiet = TRUE)
+  cat(imported_vis, sep = "\n")
+
+  cat(ifelse(is_transposed, "Note that in this image, columns and rows are reversed.", ""))
+}
+```
+
+```{r child-sbm, echo=FALSE, results = 'asis'}
+if (show_sbm) {
+  cat("## Results of the stochastic block model")
+
+  sbm_text <- knitr::knit_child("child_sbm_en.Rmd", quiet = TRUE)
+  cat(sbm_text,'\n', sep = "\n")
+
+  cat("## SBM visualization")
+
+  sbm_vis <- knitr::knit_child("child_sbm_visual.Rmd", quiet = TRUE)
+  cat(sbm_vis, sep = "\n")
+
+  cat(ifelse(is_transposed, "Note that in this image, columns and rows are reversed.", ""))
+}
+```
+
+# References
+
+1.  Chiquet J, Donnet S, Barbillon P (2023).  sbm: Stochastic Blockmodels. R package version 0.4.5,  
+  [https://CRAN.R-project.org/package=sbm](https://CRAN.R-project.org/package=sbm).
+  
+2.  Vanrenterghem T, Julie A (2023).  ShinySBM: A shiny application for Stochastic Blockmodels. R package on gitlab,  
+  [https://forgemia.inra.fr/theodore.vanrenterghem/shinySbm](https://forgemia.inra.fr/theodore.vanrenterghem/shinySbm).
+  
+3.  We are grateful to the INRAE MIGALE bioinformatics facility (MIGALE, INRAE, 2020. Migale bioinformatics Facility, doi:
+  10.15454/1.5572390655343293E12) for providing help and/or computing and/or storage resources.
+  

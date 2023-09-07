@@ -1,0 +1,9 @@
+
+
+
+```{r matrix-plot ,fig.align = 'center', echo=FALSE, fig.width=12}
+plotSbm(R$upload$Dataset$matrix,
+  transpose = R$options$showTransposed,
+  labels = R$upload$labels, plotOptions = R$options
+)
+```

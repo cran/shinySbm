@@ -1,0 +1,3 @@
+## Rapport Vide
+
+Vous n'avez rien importé le rapport est donc vide. Ce rapport étant basé sur une image courante de l'application, veuillez importer un jeu de donnée et lancer le SBM pour l'enrichir.

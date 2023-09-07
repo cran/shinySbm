@@ -1,0 +1,123 @@
+
+### Model selection
+
+```{r description-sbm, echo=FALSE}
+modelName <- stringr::str_to_title(R$sbm$modelName)
+
+nb_models <- dim(R$sbm$storedModels)[1]
+
+if (is_bipartite) {
+  bip_min <- paste0(
+    " (", R$sbm$storedModels$rowBlocks[1], " ", R$upload$labels$row,
+    " and ", R$sbm$storedModels$colBlocks[1], " ", R$upload$labels$col, ")"
+  )
+  bip_max <- paste0(
+    " (", R$sbm$storedModels$rowBlocks[nb_models], " ", R$upload$labels$row,
+    " and ", R$sbm$storedModels$colBlocks[nb_models], " ", R$upload$labels$col, ")"
+  )
+  bip_cur <- paste0(
+    " (", R$sbm$nbBlocks[[1]], " ", R$upload$labels$row,
+    " and ", R$sbm$nbBlocks[[2]], " ", R$upload$labels$col, ")"
+  )
+  bip_best <- paste0(
+    " (", R$sbm$storedModels$rowBlocks[[which.max(R$sbm$storedModels$ICL)]][[1]],
+    " ", R$upload$labels$row, " and ",
+    R$sbm$storedModels$colBlocks[[which.max(R$sbm$storedModels$ICL)]][[1]],
+    " ", R$upload$labels$col, ")"
+  )
+} else {
+  bip_min <- ""
+  bip_max <- ""
+  bip_cur <- ""
+  bip_best <- ""
+}
+
+nb_block_best <- R$sbm$storedModels$nbBlocks[[which.max(R$sbm$storedModels$ICL)]][[1]]
+
+if (R$sbm$ICL != max(R$sbm$storedModels$ICL)) {
+  entrop_cur <- paste0(
+    "The most likely model has an ILC of ",
+    round(max(R$sbm$storedModels$ICL), 2),
+    " for ",
+    nb_block_best, " blocks ", bip_best
+  )
+} else {
+  entrop_cur <- paste0("On all estimated SBM, the selected one is the most likely")
+}
+```
+
+
+Following application of the sbm model (`r modelName`), `r nb_models` models were estimated, each with a different number of blocks ranging from `r R$sbm$storedModels$nbBlocks[1]` `r bip_min` to `r R$sbm$storedModels$nbBlocks[nb_models]` `r bip_max` blocks.
+
+The selected model in this document has `r sum(R$sbm$nbBlocks)` blocks`r bip_cur`. The ICL of this model is `r R$sbm$ICL`. `r entrop_cur`.
+On this table the `r colorize("red line",'red')` is the best model according to the ICL criteria and the `r colorize("blue line",'lightblue', highlight = T)` is the selected one.
+
+```{r all-sbm, echo=FALSE,results='asis',warning=FALSE}
+get_flextable(R$sbm, R$upload$labels, type = "storedModels", settings = list(caption = "All Stored Models")) %>%
+  fit_width_to_output()
+```
+
+### Selected model 
+
+```{r block-proportion, echo=FALSE,results='asis',warning=FALSE}
+col_block_names <- paste0(
+  R$upload$labels$col, "_",
+  1:R$sbm$nbBlocks[[1 + is_bipartite]]
+)
+row_block_names <- paste0(
+  R$upload$labels$row, "_",
+  1:R$sbm$nbBlocks[[1]]
+)
+
+if (is_bipartite) {
+  example_block <- shinySbm:::round_proportion(R$sbm$blockProp$row)[[R$sbm$nbBlocks[[1]]]] * 100
+} else {
+  example_block <- shinySbm:::round_proportion(R$sbm$blockProp)[[R$sbm$nbBlocks[[1]]]] * 100
+}
+
+get_flextable(R$sbm, R$upload$labels, type = "blockProp", settings = list(caption = "Block proportion")) %>%
+  fit_width_to_output()
+```
+<br>
+Here, for example, `r example_block`\% of the `r R$upload$labels$row` are in the `r row_block_names[[R$sbm$nbBlocks[[1]]]]` block. 
+
+```{r block-connectivity, echo=FALSE,results='asis',warning=FALSE}
+get_flextable(R$sbm, R$upload$labels, type = "connectParam", settings = list(caption = "Connectivity between blocks")) %>%
+  fit_width_to_output()
+```
+<br> 
+The values in this table are the connectivity parameters of the sbm model (`r modelName`).
+
+```{r description-connectivity,echo=FALSE,results='asis'}
+ex_index <- min(2, R$sbm$nbBlocks[[1 + is_bipartite]])
+example_val <- round(R$sbm$connectParam$mean[1, ex_index], nb_digits)
+
+if (R$sbm$modelName == "bernoulli") {
+  connect_paraph <- paste0(
+    "For example, if we take a node A in the block ",
+    row_block_names[[1]], " in rows and a node B in the block ",
+    col_block_names[[ex_index]], " in columns. Then there is a probability of ", example_val, " that node A is connected to node B."
+  )
+} else if (R$sbm$modelName == "poisson") {
+  connect_paraph <- paste0(
+    "For example, nodes in block ",
+    row_block_names[[1]], " in rows and block nodes ",
+    col_block_names[[ex_index]], " in columns have an average connection value of ",
+    example_val, " . Their connection can be simulated by a ",
+    modelName, " parameter lamba = ", example_val, " ."
+  )
+} else {
+  connect_paraph <- paste0(
+    "We can read that the nodes in block ",
+    row_block_names[[1]], " in rows and block nodes ",
+    col_block_names[[ex_index]], " in columns have an average connection value of ",
+    example_val,
+    " . We can simulate their connection using a Normal",
+    " distribution with parameters mu = ",
+    example_val, " and sigma = ",
+    round(R$sbm$connectParam$var[[1]], 3), " ."
+  )
+}
+cat(connect_paraph)
+```
+The selected model has an entropy (overall index of certainty of belonging to the assigned blocks) of `r R$sbm$entropy` .

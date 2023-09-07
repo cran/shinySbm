@@ -1,0 +1,58 @@
+---
+title: "Rapport Shiny SBM"
+params:
+  upload: NA
+  sbm: NA
+  options: NA
+  langue: FR
+---
+
+```{r child-setup, child= 'child_setup.Rmd'}
+```
+
+```{r child-empty, child=if(!show_mat & !show_sbm) 'child_empty_fr.Rmd'}
+```
+
+```{r child-imported, echo=FALSE, results = 'asis'}
+if (show_mat) {
+  cat(paste0("## Introduction\nCe rapport automatique ", "\ue0", " ", "\ue9", "t", "\ue9", " produit par l'application [Shiny SBM](https://forgemia.inra.fr/theodore.vanrenterghem/shinySbm) (aussi disponible via ce [lien](https://shiny.migale.inrae.fr/app/ShinySBM)). C'est un r", "\ue9", "sum", "\ue9", " d'application d'un modèle ", "\ue0", " blocs stochastique. La partie mod", "\ue9", "lisation est bas", "\ue9", " sur le package [sbm](https://CRAN.R-project.org/package=sbm) de R."))
+
+  imported_text <- knitr::knit_child("child_imported_fr.Rmd", quiet = TRUE)
+  cat(imported_text,'\n', sep = "\n")
+
+  cat("## Visuel de Matrice")
+
+  imported_vis <- knitr::knit_child("child_imported_visual.Rmd", quiet = TRUE)
+  cat(imported_vis, sep = "\n")
+
+  cat(ifelse(is_transposed, paste0("\uc0", " noter que sur cette image, colonnes et lignes sont invers", "\ue9", "es."), ""))
+}
+```
+
+```{r child-sbm, echo=FALSE, results = 'asis'}
+if (show_sbm) {
+  cat("## R", "\ue9", "sultats du mod", "\ue8", "le ", "\ue0", " blocs stochastiques", sep = "")
+
+  sbm_text <- knitr::knit_child("child_sbm_fr.Rmd", quiet = TRUE)
+  cat(sbm_text,"\n", sep = "\n")
+
+  cat("## Visualisation du SBM")
+
+  sbm_vis <- knitr::knit_child("child_sbm_visual.Rmd", quiet = TRUE)
+  cat(sbm_vis, sep = "\n")
+
+  cat(ifelse(is_transposed, paste0("\uc0", " noter que sur cette image, colonnes et lignes sont invers", "\ue9", "es."), ""))
+}
+```
+
+# Références
+
+1.  Chiquet J, Donnet S, Barbillon P (2023).  sbm: Stochastic Blockmodels. R package version 0.4.5,  
+  [https://CRAN.R-project.org/package=sbm](https://CRAN.R-project.org/package=sbm).
+  
+2.  Vanrenterghem T, Julie A (2023).  ShinySBM: A shiny application for Stochastic Blockmodels. R package on gitlab,  
+  [https://forgemia.inra.fr/theodore.vanrenterghem/shinySbm](https://forgemia.inra.fr/theodore.vanrenterghem/shinySbm).
+  
+3.  We are grateful to the INRAE MIGALE bioinformatics facility (MIGALE, INRAE, 2020. Migale bioinformatics Facility, doi:
+  10.15454/1.5572390655343293E12) for providing help and/or computing and/or storage resources.
+  

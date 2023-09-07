@@ -1,0 +1,126 @@
+
+### Sélection du modèle
+
+```{r description-sbm, echo=FALSE}
+if (R$sbm$modelName %in% c("bernoulli", "poisson")) {
+  modelName <- stringr::str_to_title(R$sbm$modelName)
+} else {
+  modelName <- "Gaussien"
+}
+
+nb_models <- dim(R$sbm$storedModels)[1]
+
+if (is_bipartite) {
+  bip_min <- paste0(
+    " (", R$sbm$storedModels$rowBlocks[1], " ", R$upload$labels$row,
+    " et ", R$sbm$storedModels$colBlocks[1], " ", R$upload$labels$col, ")"
+  )
+  bip_max <- paste0(
+    " (", R$sbm$storedModels$rowBlocks[nb_models], " ", R$upload$labels$row,
+    " et ", R$sbm$storedModels$colBlocks[nb_models], " ", R$upload$labels$col, ")"
+  )
+  bip_cur <- paste0(
+    " (", R$sbm$nbBlocks[[1]], " ", R$upload$labels$row,
+    " et ", R$sbm$nbBlocks[[2]], " ", R$upload$labels$col, ")"
+  )
+  bip_best <- paste0(
+    " (", R$sbm$storedModels$rowBlocks[[which.max(R$sbm$storedModels$ICL)]][[1]],
+    " ", R$upload$labels$row, " et ",
+    R$sbm$storedModels$colBlocks[[which.max(R$sbm$storedModels$ICL)]][[1]],
+    " ", R$upload$labels$col, ")"
+  )
+} else {
+  bip_min <- ""
+  bip_max <- ""
+  bip_cur <- ""
+  bip_best <- ""
+}
+
+nb_block_best <- R$sbm$storedModels$nbBlocks[[which.max(R$sbm$storedModels$ICL)]][[1]]
+
+if (R$sbm$ICL != max(R$sbm$storedModels$ICL)) {
+  entrop_cur <- paste0(
+    "Contre ", round(max(R$sbm$storedModels$ICL), 2),
+    " pour le mod", "\ue8", "le le plus vraisemblant ", "\ue0 ",
+    nb_block_best, " blocs ", bip_best
+  )
+} else {
+  entrop_cur <- paste0("Sur tout les SBM observ", "\ue9", "s ce mod", "\ue8", "le ", "\ue0", " l'ICL la plus ", "\ue9", "l", "\ue9", "v", "\ue9", "e, c'est le plus vraisemblable")
+}
+```
+
+
+Suite à l'application du modèle sbm (`r modelName`), `r nb_models` modèles ont été trouvés avec pour chacun un nombre de blocs différent allant de `r R$sbm$storedModels$nbBlocks[1]` `r bip_min` à `r R$sbm$storedModels$nbBlocks[nb_models]` blocs`r bip_max`. 
+
+Le modèle sélectionné dans ce document est à `r sum(R$sbm$nbBlocks)` blocs`r bip_cur`. L'ICL (Critère de vraisemblance intégrée sur données-complète) de ce modèle vaut `r R$sbm$ICL`. `r entrop_cur`.
+Dans cette table `r colorize("la ligne en rouge",'red')` est le meilleur modèle selon le critère d'ICL et `r colorize("la ligne en bleu",'lightblue', highlight = T)` est le modèle séléctionné. 
+
+```{r all-sbm, echo=FALSE,results='asis',warning=FALSE}
+get_flextable(R$sbm,R$upload$labels,type = 'storedModels', settings = list(caption = "All Stored Models")) %>% 
+  fit_width_to_output()
+```
+
+### Modèle sélectionné 
+
+```{r block-proportion, echo=FALSE, results='asis',warning=FALSE}
+col_block_names <- paste0(
+  R$upload$labels$col, "_",
+  1:R$sbm$nbBlocks[[1 + is_bipartite]]
+)
+row_block_names <- paste0(
+  R$upload$labels$row, "_",
+  1:R$sbm$nbBlocks[[1]]
+)
+
+if (is_bipartite) {
+  example_block <- shinySbm:::round_proportion(R$sbm$blockProp$row)[[R$sbm$nbBlocks[[1]]]] * 100
+} else {
+  example_block <- shinySbm:::round_proportion(R$sbm$blockProp)[[R$sbm$nbBlocks[[1]]]] * 100
+}
+
+get_flextable(R$sbm,R$upload$labels,type = 'blockProp', settings = list(caption = "Proportion des blocs")) %>% 
+  fit_width_to_output()
+```
+<br>
+Ici par exemple `r example_block`\% des `r R$upload$labels$row` sont dans le bloc `r row_block_names[[R$sbm$nbBlocks[[1]]]]`. 
+
+```{r block-connectivity, echo=FALSE,results='asis',warning=FALSE}
+get_flextable(R$sbm,R$upload$labels,type = "connectParam", settings = list(caption = paste0("Connectivit",'\ue9'," des blocs"))) %>% 
+  fit_width_to_output()
+```
+<br> 
+Les valeurs dans ce tableau sont les paramètres de connectivité du model sbm (`r modelName`). 
+
+```{r description-connectivity,echo=FALSE,results='asis'}
+ex_index <- min(2, R$sbm$nbBlocks[[1 + is_bipartite]])
+example_val <- round(R$sbm$connectParam$mean[1, ex_index], nb_digits)
+if (R$sbm$modelName == "bernoulli") {
+  connect_paraph <- paste0(
+    "Par exemple, si l'on prend un noeud A dans le bloc ",
+    row_block_names[[1]], " en lignes et un noeud B dans le bloc ",
+    col_block_names[[ex_index]], " en colonnes. Alors le noeud A ", "\ue0",
+    " une probabilit", "\ue9", " ", example_val, " d'",
+    "\uea", "tre connect", "\ue9", " au noeud B."
+  )
+} else if (R$sbm$modelName == "poisson") {
+  connect_paraph <- paste0(
+    "Par exemple, les noeuds du bloc ",
+    row_block_names[[1]], " en lignes et les noeuds du bloc ",
+    col_block_names[[ex_index]], " en colonnes ont une connection valant en moyenne ",
+    example_val, " . On peut simuler leurs connections par une loi de ",
+    modelName, " de param", "\ue8", "tre lamba = ", example_val, " ."
+  )
+} else {
+  connect_paraph <- paste0(
+    "Par exemple, les noeuds du bloc ",
+    row_block_names[[1]], " en lignes et les noeuds du bloc ",
+    col_block_names[[ex_index]], " en colonnes ont une connection valant en moyenne ",
+    example_val,
+    " . On peut simuler leur connection par une loi Normale de param", "\ue8",
+    "tre mu = ", example_val, " et sigma = ",
+    round(R$sbm$connectParam$var[[1]], 3), " ."
+  )
+}
+cat(connect_paraph)
+```
+Le modèle séléctionné possède une entropie (Indice globale de certitude d'appartenance aux blocs attribués) de `r R$sbm$entropy` .
