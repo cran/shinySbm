@@ -1,6 +1,6 @@
 Package: shinySbm
 Title: 'shiny' Application to Use the Stochastic Block Model
-Version: 0.1.4
+Version: 0.1.5
 Authors@R: 
   c(person(given = "Theodore", family = "Vanrenterghem", 
            email = "shiny.sbm.dev@gmail.com", role = c("cre", "aut")),
@@ -32,7 +32,7 @@ LazyData: true
 RoxygenNote: 7.2.3
 NeedsCompilation: no
 VignetteBuilder: knitr
-Packaged: 2023-09-06 12:23:53 UTC; theod
+Packaged: 2023-09-07 16:37:53 UTC; theodore
 Author: Theodore Vanrenterghem [cre, aut],
   Julie Aubert [aut] (<https://orcid.org/0000-0001-5203-5748>),
   Saint-Clair Chabert-Liddell [aut]
@@ -41,4 +41,4 @@ Author: Theodore Vanrenterghem [cre, aut],
   Golem User [cph]
 Maintainer: Theodore Vanrenterghem <shiny.sbm.dev@gmail.com>
 Repository: CRAN
-Date/Publication: 2023-09-07 08:30:02 UTC
+Date/Publication: 2023-09-07 21:50:02 UTC
